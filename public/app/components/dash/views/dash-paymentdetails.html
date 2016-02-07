@@ -1,0 +1,112 @@
+<!--Main contents starts here-->
+<div class="am-content">
+<div class="main-content">
+  <!--+general-chart("classes", "title", "height", "id", "counter value", "counter desc", tools enabled (use true or false))-->
+<div class="row">
+<div class="col-sm-12">
+      <div class="panel panel-default">
+          <button data-toggle="modal" data-target="#form-bp1" type="button" class="btn btn-space btn-primary pull-right">Create New Payment Card</button>
+        <div class="panel-heading"><span class="panel-title">Card Managment</span></div>
+        <div class="panel-body">
+          <div class="spacer">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Name of Card</th>
+                  <th class="text-center">Bank</th>
+                  <th class="text-center">Card Number</th>
+                    <th class="text-center">Activate</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Default</td>
+                  <td class="text-center">Default</td>
+                  <td class="text-center">Default</td>
+                    <td class="text-center"><input type="radio" checked="" name="rad1" id="rad1"></td>
+                </tr>
+                <tr>
+                  <td>Primary</td>
+                  <td class="text-center">Default</td>
+                  <td class="text-center">Default</td>
+                    <td class="text-center"><input type="radio" checked="" name="rad1" id="rad2"></td>
+                </tr>
+                <tr>
+                  <td>Success</td>
+                  <td class="text-center">Default</td>
+                    <td class="text-center">Default</td>
+                    <td class="text-center"><input type="radio" checked="" name="rad1" id="rad1"></td>
+                </tr>
+                <tr>
+                  <td>Info</td>
+                  <td class="text-center">Default</td>
+                  <td class="text-center">Default</td>
+                    <td class="text-center"><input type="radio" checked="" name="rad1" id="rad1"></td></td>
+                </tr>
+                <tr>
+                  <td>Warning</td>
+                  <td class="text-center">Default</td>
+                  <td class="text-center">Default</td>
+                    <td class="text-center"><input type="radio" checked="" name="rad1" id="rad1"></td>
+                </tr>
+                <tr>
+                  <td>Danger</td>
+                  <td class="text-center">Default</td>
+                  <td class="text-center">Default</td>
+                    <td class="text-center"><input type="radio" checked="" name="rad1" id="rad1"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</div>
+    </div>
+</div>
+<!--Main contents ends here-->
+
+<!-- Inventory Modal starts here-->
+
+<div id="form-bp1" tabindex="-1" role="dialog" class="modal fade colored-header">
+<div class="modal-dialog custom-width">
+<div class="modal-content">
+  <div class="modal-header">
+    <button type="button" data-dismiss="modal" aria-hidden="true" class="close md-close"><i class="icon s7-close"></i></button>
+    <h3 class="modal-title">Form Modal</h3>
+  </div>
+  <div class="modal-body form">
+    <div class="form-group">
+      <label>Organization</label>
+      <input type="name" placeholder="Mcdonalds" class="form-control">
+    </div>
+    <div class="form-group">
+      <label>Contact Name</label>
+      <input type="name" placeholder="Choose Contact Name" class="form-control">
+    </div>
+      <div class="form-group">
+      <label>Relationship</label>
+      <div class="col-sm-12">
+                <select class="form-control">
+                  <option>Internal Branch</option>
+                  <option>Supplier</option>
+                  <option>Customer</option>
+                  <option>Other</option>
+                </select>
+              </div>
+    </div>
+  </div>
+    <br>
+    <br>
+    <br>
+    <br>
+  <div class="modal-footer">
+    <button type="button" data-dismiss="modal" class="btn btn-default md-close">Cancel</button>
+    <button type="button" data-dismiss="modal" class="btn btn-primary md-close">Proceed</button>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- Inventory Modal Ends Here-->

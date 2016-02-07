@@ -1,0 +1,317 @@
+// Ctrl For Home
+app.controller('HomeCtrl', function($scope) {
+
+})
+
+// Ctrl For Signup
+app.controller('DashSignupCtrl', function($scope, $http, $rootScope) {
+    $scope.register = function(user){
+        //todo verify if the passwords are the same
+        if(user.password == user.password2){
+            $http.post('/api/register', user)
+            .success(function(user){
+                $rootScope.currentUser = user;
+                console.log(user);
+            });
+        }
+    };
+})
+
+// Ctrl For Signup
+app.controller('DashLoginCtrl', function($scope, $http, $rootScope, $location) {
+    $scope.login = function(user, $event){
+        $event.preventDefault();
+        $http.post('/api/login', user).success(function(response){
+            $location.url("/dash");
+            $rootScope.currentUser = user;
+        });
+    };
+})
+
+app.controller('StaffSigninCtrl', function($scope, $http, $rootScope, $location) {
+    $scope.signin = function(staff, $event){
+        $event.preventDefault();
+        $http.post('/api/signin', staff).success(function(response){
+            $location.url("/admin");
+            $rootScope.currentStaff = staff;
+        });
+    };
+})
+
+app.controller('DashUsersCtrl', function($scope, $http) {
+      $scope.displayOneUser = function(id) {
+        var temp = $scope.users.filter(function(ele){
+            return ele._id == id;
+        })
+        $scope.username = temp[0]["username"];
+        $scope.email = temp[0]["email"];
+        $scope.address = temp[0]["address"];
+        $scope.city = temp[0]["city"];
+        $scope.postcode = temp[0]["postcode"];
+        $scope.bank = temp[0]["bank"];
+        $scope.acc = temp[0]["acc"];
+        $scope.sc = temp[0]["sc"];
+    };
+    var refresh = function() {
+        $http.post('/api/userlist').success(function(response) {
+            $scope.users = response.data;
+        });
+    };
+    refresh();
+})
+
+app.controller('DashDriversCtrl', function($scope, $http) {
+    $scope.displayOneDriver = function(id) {
+        var temp = $scope.drivers.filter(function(ele){
+            return ele._id == id;
+        })
+        $scope.username = temp[0]["username"];
+        $scope.email = temp[0]["email"];
+        $scope.day = temp[0]["day"];
+        $scope.month = temp[0]["month"];
+        $scope.year = temp[0]["year"];
+        $scope.address = temp[0]["address"];
+        $scope.city = temp[0]["city"];
+        $scope.postcode = temp[0]["postcode"];
+        $scope.reg = temp[0]["reg"];
+        $scope.bank = temp[0]["bank"];
+        $scope.acc = temp[0]["acc"];
+        $scope.sc = temp[0]["sc"];
+    };
+    var refresh = function() {
+        $http.post('/api/driverlist').success(function(response) {
+            $scope.drivers = response.data;
+        });
+    };
+    refresh();
+})
+
+app.controller('DashStaffCtrl', function($scope, staff, $http, $rootScope) {
+    $scope.staff = staff;
+    $scope.addstaff = function(){
+        //todo verify if the passwords are the same
+        if(staff.password == staff.password2){
+            $http.post('/api/addstaff', staff)
+            .success(function(staff){
+                $rootScope.currentUser = staff;
+            });
+        };
+    };
+    var refresh = function() {
+        $http.post('/api/stafflist').success(function(response) {
+            $scope.stafflist = response.data;
+        });
+    };
+    refresh();
+})
+
+app.controller('ContractorSignupCtrl', function($scope, $http, $rootScope, driver) {
+    $scope.driver = driver;
+    $scope.signup = function(){
+        //todo verify if the passwords are the same
+        if(driver.password == driver.password2){
+            $http.post('/api/signup', driver).success(function(driver){
+                $rootScope.currentUser = driver;
+            });
+        };
+    };
+})
+
+app.controller('AdminHomeCtrl', function($scope, $http) {
+     var refresh = function() {
+        $http.post('/api/driverlist').success(function(response) {
+            var driverCount = Object.keys(response.data).length
+            $scope.drivers = driverCount;
+        });
+    };
+    var refine = function() {
+        $http.post('/api/userlist').success(function(response) {
+            var userCount = Object.keys(response.data).length
+            $scope.users = userCount;
+        });
+    };
+    refresh();
+    refine();
+})
+
+// Ctrl For Dash
+app.controller('DashHomeCtrl', function($scope, dash) {
+    $scope.dash = dash;
+})
+
+// Ctrl For Dash
+app.controller('DashInstantCtrl', function($scope, $location, dashInstant, dashVans, dashPorters, maps, $http, tdispatch) {
+    $scope.dashInstant = dashInstant;
+    $scope.dashVans = dashVans;
+    $scope.dashPorters = dashPorters;
+    $scope.dashInstant.jobDate = new Date();
+    $scope.tdispatch = tdispatch;
+
+    // Set up autocomplete
+    $scope.address = dashInstant.address;
+
+    $scope.autocompleteOptions = {
+        componentRestrictions: { country: 'uk' },
+        types: ['geocode']
+    }
+    // Start GMaps
+    maps.init();
+
+    $scope.showWaypointField = function(type) {
+        var waypointFields = $('[data-address-type="'+type+'"]').length;
+        var hiddenWaypointFields = $('[data-address-type="'+type+'"].hide').length;
+        var waypointId = (waypointFields - hiddenWaypointFields) + 2;
+        $('[data-address-type="'+type+'"][data-address-id="'+waypointId+'"]').removeClass("hide");
+    }
+
+    $scope.chooseVans = function(vanType, $event) {
+        $scope.dashInstant.vanType = vanType;
+        // Mark Chosen Van Box
+        $('.van-choose').removeClass('bord-picked');
+        $.each($('.van-choose'), function(i,v) {
+            if($(v).attr('data-van') == vanType) {
+                $(v).addClass('bord-picked');
+            }
+        });
+    }
+
+    $scope.choosePorters = function(porterQty, $event) {
+        $scope.dashInstant.porterQty = porterQty;
+        // Mark Chosen Van Box
+        $('.porter-qty').removeClass('bord-picked');
+        $.each($('.porter-qty'), function(i,v) {
+            if($(v).attr('data-porter') == porterQty) {
+                $(v).addClass('bord-picked');
+            }
+        });
+        console.log($scope.dashInstant.porterQty);
+    }
+
+    $scope.updateMaps = function() {
+        if($scope.address.start_location.formatted_address) {
+            $scope.address.start_location.name = $scope.address.start_location.formatted_address;
+        }
+        if($scope.address.end_location.formatted_address) {
+            $scope.address.end_location.name = $scope.address.end_location.formatted_address;
+        }
+        if($scope.address.pickup1.formatted_address) {
+            $scope.address.pickup1.name = $scope.address.pickup1.formatted_address;
+        }
+        if($scope.address.dropoff1.formatted_address) {
+            $scope.address.dropoff1.name = $scope.address.dropoff1.formatted_address;
+        }
+        if($scope.address.pickup2.formatted_address) {
+            $scope.address.pickup2.name = $scope.address.pickup2.formatted_address;
+        }
+        if($scope.address.dropoff2.formatted_address) {
+            $scope.address.dropoff2.name = $scope.address.dropoff2.formatted_address;
+        }
+        if($scope.address.start_location.name !== '' && $scope.address.end_location.name !== '') {
+            maps.setDirections($scope.address, function(distance) {
+                var tempMiles = 0.000621371192237 * distance;
+                dashInstant.fuelPrice = Math.round(tempMiles * 0.72);
+            });
+        }
+    }
+
+    $scope.bookInstantJob = function(){
+        $http.post('/api/tdispatch-book', {data: dashInstant}, function(data) {
+            console.log(data);
+        })
+    }
+
+    $scope.saveInstantjob = function(){
+        $http.post('/api/save-instant-job', {data: dashInstant}).then(function(res){
+            // $scope.matchFields(res);
+        }, function(response){
+            // failure callback
+        });
+    }
+
+    $scope.calcInstantJob = function() {
+        $http.post('/api/tdispatch-calc', {data: dashInstant}).then(function(res){
+            $scope.matchFields(res);
+        }, function(response){
+            // failure callback
+        });
+    }
+
+    $scope.matchFields = function(res) {
+        $scope.dashInstant.waitTime = 'Wait Time: '+res.data.data.fare.time_to_wait / 60+' Mins';
+        $scope.dashInstant.suggestedPrice = res.data.data.fare.total_cost;
+        dashInstant = $scope.dashInstant;
+    }
+})
+
+app.controller('DashScheduleCtrl', function($scope, $location, dashInstant) {
+    //
+})
+
+app.controller('DashRecurringCtrl', function($scope, $location, dashInstant) {
+    //
+})
+
+app.controller('DashProjectCtrl', function($scope, $location, dashInstant) {
+    //
+})
+
+app.controller('DashAddressBookCtrl', function($scope, $location, dashInstant) {
+    //
+})
+
+app.controller('DashAddressBookCtrl', function($scope, $http, $rootScope) {
+    var idGrab = function() {
+        return $rootScope.currentUser._id;
+    }
+    var refresh = function() {
+        $http.post('/api/contactlist', {data:idGrab()}).success(function(response) {
+            $scope.conlist = response.data;
+            console.log($scope.conlist);
+        });
+    };
+    refresh();
+    $scope.addContact =function() {
+        $http.post('/api/add-contact', {
+            contact: $scope.contact,
+            user: $rootScope.currentUser._id
+        }).success(function(response){
+            refresh();
+        });
+     };
+})
+
+app.controller('DashJobCompleteCtrl', function($scope, $location, dashInstant) {
+    //
+})
+
+// Ctrl For Navigation
+app.controller('NaviCtrl', function($scope, views, $route) {
+    $scope.views = views;
+    // Grab appRoute.js Action Param
+    views.type = $route.current.type;
+    views.currentView = $route.current.action;
+
+    $scope.logout = function(){
+        $http.post("/api/logout").success(function(){
+            $location.url("/login");
+        });
+    };
+
+    $scope.openTicketbar = function(){
+        var ele = $(".am-right-sidebar:hidden");
+        if (ele.hasClass("open-right-sidebar")){
+            ele.removeClass("open-right-sidebar");
+        }else{
+            ele.addClass("open-right-sidebar");
+        }
+    };
+})
+
+
+// Ctrl For Navigation
+app.controller('NaviAdminCtrl', function($scope, views, $route) {
+    $scope.views = views;
+    // Grab appRoute.js Action Param
+    views.type = $route.current.type;
+    views.currentView = $route.current.action;
+})
