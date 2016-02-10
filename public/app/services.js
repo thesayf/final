@@ -1,6 +1,7 @@
 app.factory("views", function(){
     return {
-        currentView: 'dash-home',
+        currentView: '',
+        currentType: '',
     };
 });
 
@@ -172,29 +173,44 @@ app.factory("staff", function(){
         email: '',
         firstname: '',
         lastname: '',
-        };
+    };
 });
 
-app.service("authInter", function($location, views){
-    if(views.type == 'dash') {
-        /*$.ajax({
-            url: "/api/login-auth",
-            method:"POST"
-        }).done(function(user){
-            if (user !== '0') {
-                // $rootScope.currentUser = user;
-            } else {
-                $location.path('/login');
-            }
-        });*/
+app.service('auth', function($location){
+    var auth = {};
+
+    auth.intercept = function(views) {
+        console.log(views.currentType);
+        if(views.currentType == 'dash') {
+            $.ajax({
+                url: "/api/login-auth",
+                method:"POST"
+            }).done(function(user){
+                if(user !== '0') {
+                    // $rootScope.currentUser = user;
+                } else {
+                    $location.path('/login');
+                }
+            });
+        }
+        if(views.currentType == 'admin') {
+            $.ajax({
+                url: "/api/signin-auth",
+                method:"POST"
+            }).done(function(user){
+                if(user !== '0') {
+                    // $rootScope.currentUser = user;
+                } else {
+                    $location.path('/login');
+                }
+            });
+        }
     }
-    if(views.type == 'admin') {
-        // do someting else bredgin
-    }
+    return auth;
 });
 
 
-app.service('maps', function(dashInstant, $timeout, $window, dashInstant) {
+app.service('maps', function(dashInstant, $timeout, $window) {
     var maps = {};
 
     // Set Vars
@@ -307,4 +323,235 @@ app.service('tdispatch', function($http, dashInstant) {
     }*/
 
     return tdispatch;
+})
+
+
+app.service('validation', function() {
+
+    var validation = {};
+
+    validation.checkVal = function(valiOptions, callback) {
+        var flag = 0
+
+        $.each(valiOptions, function(key, value) {
+
+            var name = value.eleName;
+            var val = $('[name="'+value.eleName+'"]').val();
+            var type = value.type;
+            var msg = value.msg;
+            var passwordSave = '';
+
+            $('[name="'+name+'"]').closest('div').removeClass('has-success');
+            $('[name="'+name+'"]').closest('div').removeClass('has-error');
+
+            if(type == 'text') {
+                if(val.length > 0 ) {
+                    $('[name="'+name+'"]').closest('div').addClass('has-success');
+                    flag += 0;
+                } else {
+                    toastr.error(msg);
+                    $('[name="'+name+'"]').closest('div').addClass('has-error');
+                    flag += 1;
+                }
+            }
+
+            if(type == 'number') {
+                val = $('[name="'+name+'"]').val() || $('input:hidden[name="'+name+'"]').val();
+                if(val > 0) {
+                    $('[name="'+name+'"]').closest('div').addClass('has-success');
+                    flag += 0;
+                } else {
+                    toastr.error(msg);
+                    $('[name="'+name+'"]').closest('div').addClass('has-error');
+                    flag += 1;
+                }
+            }
+
+            if(type == 'select') {
+                var val = $('[name="'+value.eleName+'"]').val();
+                if(val !== null) {
+                    if(val.length > 0 ) {
+                        $('[name="'+name+'"]').closest('div').addClass('has-success');
+                        $('[name="'+name+'"]').addClass('success-placeholder');
+                        flag += 0;
+                    } else {
+                        toastr.error(msg);
+                        $('[name="'+name+'"]').closest('div').addClass('has-error');
+                        flag += 1;
+                    }
+                } else {
+                    toastr.error(msg);
+                    $('[name="'+name+'"]').closest('div').addClass('has-error');
+                    flag += 1;
+                    $('[name="'+name+'"]').addClass('error-placeholder');
+                }
+            }
+
+            if(type == 'name') {
+                if(val.length > 3 ) {
+                    $('[name="'+name+'"]').closest('div').addClass('has-success');
+                    flag += 0;
+                } else {
+                    toastr.error(msg);
+                    $('[name="'+name+'"]').closest('div').addClass('has-error');
+                    flag += 1;
+                }
+            }
+
+            if(type == 'email') {
+                if(validateEmail(val) == true) {
+                    $('[name="'+name+'"]').closest('div').addClass('has-success');
+                    flag += 0;
+                } else {
+                    toastr.error(msg);
+                    $('[name="'+name+'"]').closest('div').addClass('has-error');
+                    flag += 1;
+                }
+            }
+
+            if(type == 'postcode') {
+                if(validatePostcode(val) == true) {
+                    $('[name="'+name+'"]').closest('div').addClass('has-success');
+                    flag += 0;
+                } else {
+                    toastr.error(msg);
+                    $('[name="'+name+'"]').closest('div').addClass('has-error');
+                    flag += 1;
+                }
+            }
+
+            if(type == 'phone') {
+                if(validatePhone(val) == true) {
+                    $('[name="'+name+'"]').closest('div').addClass('has-success');
+                    flag += 0;
+                } else {
+                    toastr.error(msg);
+                    $('[name="'+name+'"]').closest('div').addClass('has-error');
+                    flag += 1;
+                }
+            }
+
+            if(type == 'password') {
+                if(val.length > 0) {
+                    $('[name="'+name+'"]').closest('div').addClass('has-success');
+                    flag += 0;
+                } else {
+                    toastr.error(msg);
+                    $('[name="'+name+'"]').closest('div').addClass('has-error');
+                    flag += 1;
+                }
+            }
+
+            if(type == 'passwordConfirm') {
+                if(val.length > 0) {
+                    if( val == $('[name="'+value.confirmName+'"]').val() ) {
+                        $('[name="'+name+'"]').closest('div').addClass('has-success');
+                        flag += 0;
+                    } else {
+                        toastr.error(msg);
+                        $('[name="'+name+'"]').closest('div').addClass('has-error');
+                        flag += 1;
+                    }
+                } else {
+                    toastr.error(msg);
+                    $('[name="'+name+'"]').closest('div').addClass('has-error');
+                    flag += 1;
+                }
+            }
+
+        });
+
+        callback(flag);
+
+
+        function validateEmail(email) {
+            var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+            return re.test(email);
+        }
+
+        function validatePhone(phone) {
+            var re = /^(?:(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?)|(?:\(?0))(?:(?:\d{5}\)?[\s-]?\d{4,5})|(?:\d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3}))|(?:\d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4})|(?:\d{2}\)?[\s-]?\d{4}[\s-]?\d{4}))(?:[\s-]?(?:x|ext\.?|\#)\d{3,4})?$/i;
+            return re.test(phone);
+        }
+
+        function validatePostcode(postcode) {
+            // Permitted letters depend upon their position in the postcode.
+            var alpha1 = "[abcdefghijklmnoprstuwyz]";                       // Character 1
+            var alpha2 = "[abcdefghklmnopqrstuvwxy]";                       // Character 2
+            var alpha3 = "[abcdefghjkpmnrstuvwxy]";                         // Character 3
+            var alpha4 = "[abehmnprvwxy]";                                  // Character 4
+            var alpha5 = "[abdefghjlnpqrstuwxyz]";                          // Character 5
+            var BFPOa5 = "[abdefghjlnpqrst]";                               // BFPO alpha5
+            var BFPOa6 = "[abdefghjlnpqrstuwzyz]";                          // BFPO alpha6
+
+            // Array holds the regular expressions for the valid postcodes
+            var pcexp = new Array ();
+
+            // BFPO postcodes
+            pcexp.push (new RegExp ("^(bf1)(\\s*)([0-6]{1}" + BFPOa5 + "{1}" + BFPOa6 + "{1})$","i"));
+
+            // Expression for postcodes: AN NAA, ANN NAA, AAN NAA, and AANN NAA
+            pcexp.push (new RegExp ("^(" + alpha1 + "{1}" + alpha2 + "?[0-9]{1,2})(\\s*)([0-9]{1}" + alpha5 + "{2})$","i"));
+
+            // Expression for postcodes: ANA NAA
+            pcexp.push (new RegExp ("^(" + alpha1 + "{1}[0-9]{1}" + alpha3 + "{1})(\\s*)([0-9]{1}" + alpha5 + "{2})$","i"));
+
+            // Expression for postcodes: AANA  NAA
+            pcexp.push (new RegExp ("^(" + alpha1 + "{1}" + alpha2 + "{1}" + "?[0-9]{1}" + alpha4 +"{1})(\\s*)([0-9]{1}" + alpha5 + "{2})$","i"));
+
+            // Exception for the special postcode GIR 0AA
+            pcexp.push (/^(GIR)(\s*)(0AA)$/i);
+
+            // Standard BFPO numbers
+            pcexp.push (/^(bfpo)(\s*)([0-9]{1,4})$/i);
+
+            // c/o BFPO numbers
+            pcexp.push (/^(bfpo)(\s*)(c\/o\s*[0-9]{1,3})$/i);
+
+            // Overseas Territories
+            pcexp.push (/^([A-Z]{4})(\s*)(1ZZ)$/i);
+
+            // Anguilla
+            pcexp.push (/^(ai-2640)$/i);
+
+            // Assume we're not going to find a valid postcode
+            var valid = false;
+
+            // Check the string against the types of post codes
+            for ( var i=0; i<pcexp.length; i++) {
+                if(pcexp[i].test(postcode)) {
+                    // The post code is valid - split the post code into component parts
+                    pcexp[i].exec(postcode);
+
+                    // Copy it back into the original string, converting it to uppercase and inserting a space
+                    // between the inward and outward codes
+                    postcode = RegExp.$1.toUpperCase() + " " + RegExp.$3.toUpperCase();
+
+                    // If it is a BFPO c/o type postcode, tidy up the "c/o" part
+                    postcode = postcode.replace (/C\/O\s*/,"c/o ");
+
+                    // If it is the Anguilla overseas territory postcode, we need to treat it specially
+                    if(postcode.toUpperCase() == 'AI-2640') {postcode = 'AI-2640'};
+
+                    // Load new postcode back into the form element
+                    valid = true;
+
+                    // Remember that we have found that the code is valid and break from loop
+                    break;
+                }
+            }
+
+            // Return with either the reformatted valid postcode or the original invalid postcode
+            if (valid) {
+                return true;
+            } else {
+                return false;
+            }
+
+        }
+
+    }
+
+    return validation;
+
 })

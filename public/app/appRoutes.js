@@ -10,7 +10,8 @@ app.config(function($routeProvider, $locationProvider, $httpProvider) {
         .when('/dash', {
             templateUrl : 'app/components/dash/dash-view.html',
             controller  : 'DashHomeCtrl',
-            action      : 'dash-home'
+            action      : 'dash-home',
+            type        : 'dash'
         })
 
         .when('/instant', {
@@ -108,7 +109,7 @@ app.config(function($routeProvider, $locationProvider, $httpProvider) {
             templateUrl : 'app/components/home/signup.html',
             controller  : 'DashSignupCtrl',
             //action    : 'dash-allmessages',
-            type        : 'dash'
+            //type        : 'dash'
         })
 
         .when('/login', {
@@ -183,8 +184,9 @@ app.config(function($routeProvider, $locationProvider, $httpProvider) {
 
         .when('/staff-login', {
             templateUrl : 'app/components/home/staff-login.html',
-            controller  : 'StaffSigninCtrl  '
+            controller  : 'StaffSigninCtrl',
             //action    : 'dash-allmessages'
+            type        : 'admin'
         })
 
         .when('/contractor-signup', {
@@ -203,7 +205,7 @@ app.config(function($routeProvider, $locationProvider, $httpProvider) {
             redirectTo: '/'
         });
 
-        $httpProvider.interceptors.push("authInter");
+        //$httpProvider.interceptors.push("authInter");
         $locationProvider.html5Mode(true);
 
 });

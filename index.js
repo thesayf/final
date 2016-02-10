@@ -38,7 +38,7 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
 // routes ==================================================
-require(__dirname + '/server/routes')(app, Quote, Token, passport, localStrategy, needle, rest);
+require(__dirname + '/server/routes')(app, Quote, Token, User, Contact, needle, rest);
 
 app.listen(app.get('port'), function() {
     console.log('Node app is running on port', app.get('port'));

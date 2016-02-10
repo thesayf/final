@@ -25,7 +25,7 @@
                     <!-- username-->
                     <div class="form-group">
                       <div class="input-group"><span class="input-group-addon"><i class="icon s7-user"></i></span>
-                        <input ng-model="user.username" id="username" type="text" placeholder="Username" autocomplete="off" class="form-control">
+                        <input ng-model="staff.username" id="username" type="text" placeholder="Username" autocomplete="off" class="form-control">
                       </div>
                     </div>
                        <!-- username-->
@@ -33,14 +33,14 @@
                       <!--password-->
                     <div class="form-group">
                       <div class="input-group"><span class="input-group-addon"><i class="icon s7-lock"></i></span>
-                        <input ng-model="user.password" id="password" type="password" placeholder="Password" class="form-control">
+                        <input ng-model="staff.password" id="password" type="password" placeholder="Password" class="form-control">
                       </div>
                     </div>
                       <!--password-->
                       
                     <!--Submit button-->
                     <div class="form-group login-submit">
-                      <button ng-click="login(user, $event)" class="btn btn-primary btn-lg">Log me in</button>
+                      <button ng-click="signin(staff, $event)" class="btn btn-primary btn-lg">Staff signin</button>
                     </div>
                     <!--Submit button-->
                       

@@ -68,6 +68,9 @@ module.exports = function(app, Quote, Token, User, Contact, needle, rest) {
 
 	//This registers the Users
 	app.post("/api/register", function(req, res){
+
+        req.body.username = 'test';
+
 		User.findOne({username: req.body.username}, function(err, user){
 			if(user){
 			 	return res.json({
@@ -76,29 +79,50 @@ module.exports = function(app, Quote, Token, User, Contact, needle, rest) {
 				});
 			} else {
 		   		var user = new User();
-				user.username = req.body.username;
+				/*user.username = req.body.username;
 				user.password = req.body.password;
 				user.email = req.body.email;
 				user.businessname = req.body.businessname;
 				user.address = req.body.address;
+				user.doornumber = req.body.doornumber;
 				user.city = req.body.city;
 				user.postcode = req.body.postcode;
 				user.businesstype = req.body.businesstype;
 				user.firstname = req.body.firstname;
 				user.lastname = req.body.lastname;
-				user.mobile = req.body.mobile;
+				user.mobile = req.body.mobile;*/
+				user.username = 'test';
+				user.password = '123';
+				user.email = 'test@test.com';
+				user.businessname = 'test biz';
+				user.address = 'test address';
+				user.doornumber = '103';
+				user.city = 'test city';
+				user.postcode = 'cr77jj';
+				user.businesstype = 'tester';
+				user.firstname = 'test first';
+				user.lastname = 'test last';
+				user.mobile = '07894564444';
+                // Save to mongo
 				user.save(function(err, user){
-					req.login(user, function(err){
-						if(err) {
-							return res.json({
-								success: false,
-								message: "Sorry you have been unable to login at this time, please try again later"
-							});
-						}
-						return res.json({
-							success: true,
-						});
-					});
+                    // Get Tdisptch Token
+                    td.getAccessToken(function(access) {
+                        // Create Tdispatch account for user
+                        td.createAccount(user, access, function(data) {
+                            console.log(data);
+                            req.login(user, function(err){
+        						if(err) {
+        							return res.json({
+        								success: false,
+        								message: "Sorry you have been unable to login at this time, please try again later"
+        							});
+        						}
+        						return res.json({
+        							success: true,
+        						});
+        					});
+                        })
+                    })
 				});
 			} //else close
 		});
@@ -269,11 +293,52 @@ module.exports = function(app, Quote, Token, User, Contact, needle, rest) {
 
 	var td = {};
 
+    td.clientId = 'iesgbqOcGs@tdispatch.com';
+    td.clientSecret = 'PeYQRXDWWFAa3WQR7UwHJRs2DZD5eKsP';
+
+    td.tokenUrl = 'http://api.tdispatch.com/passenger/oauth2/token';
+    td.calcFareUrl = 'http://api.tdispatch.com/passenger/v1/locations/fare';
+    td.bookJobUrl = 'http://api.tdispatch.com/passenger/v1/bookings';
+    td.createAccountUrl = 'http://api.tdispatch.com/passenger/v1/passengers';
+
 	td.getAccessToken = function(callback) {
 		Token.find({}, function(err, docs) {
 			callback(docs[0]['access']);
 		})
 	}
+
+	td.getRefreshToken = function(callback) {
+		Token.find({}, function(err, docs) {
+			callback(docs[0]['refresh']);
+		})
+	}
+
+    td.saveTokens = function(tokens, callback) {
+    	var token = new Token();
+    	token.access = tokens['access_token'];
+    	token.refresh = tokens['refresh_token'];
+    	token.save(function(err) {
+    		if(err) {
+    			callback(false);
+    		} else {
+    			callback(true);
+    		}
+    	});
+    }
+
+    td.createAccount = function(user, access, callback) {
+        var info = {
+            "username": user.username,
+            "name": user.firstname+' '+user.lastname,
+            "phone": user.mobile
+        };
+
+        var url = td.createAccountUrl+'?access_token='+access;
+
+ 		rest.postJson(url, info).on('complete', function(data, resp) {
+ 			callback(data);
+ 		});
+    }
 
 	td.calcFare = function(data, access, callback) {
 		var info = data.req.body.data;
@@ -306,7 +371,7 @@ module.exports = function(app, Quote, Token, User, Contact, needle, rest) {
 		    ]*/
 		}
 
-		/*var url = 'http://api.tdispatch.com/passenger/v1/locations/fare?access_token='+access;
+		/*var url = td.calcFareUrl+'?access_token='+access;
 
 		rest.postJson(url, jsonFare).on('complete', function(data, resp) {
 			callback(data);
@@ -342,12 +407,52 @@ module.exports = function(app, Quote, Token, User, Contact, needle, rest) {
 			 //"voucher": "ABCD1234",
 	 	};
 
-		var url = 'http://api.tdispatch.com/passenger/v1/bookings?access_token='+access;
+		var url = td.bookJobUrl+'?access_token='+access;
 
 		rest.postJson(url, data).on('complete', function(data, resp) {
 			callback(data);
 		});
 	}
+
+    td.getTokens = function(authCode, callback) {
+    	var options = {
+    		code: ''+authCode+'',
+    		client_id: td.clientId,
+    		client_secret: td.clientSecret,
+    		//redirect_uri: '',
+    		grant_type: 'authorization_code',
+    		response_format: 'json'
+    	};
+
+    	options = func.param(options);
+
+    	var url = td.tokenUrl;
+
+    	needle.post(url, options, function(err, resp, body) {
+    		callback(body);
+    	});
+    }
+
+    td.refreshToken = function(refreshToken) {
+        var options = {
+            refresh_token: refreshToken,
+            client_id: td.clientId,
+            client_secret: td.clientSecret,
+            grant_type: 'refresh_token',
+        };
+        options = func.param(options);
+
+        var url = td.tokenUrl+'?'+options;
+        console.log(url);
+        var databody = {'username': 'test444@test.com', 'password': '123'};
+
+        rest.postJson(url, databody).on('complete', function(data, resp) {
+			console.log(data);
+		});
+
+    }
+
+
 
 
 
@@ -377,7 +482,6 @@ module.exports = function(app, Quote, Token, User, Contact, needle, rest) {
 
 
 
-
 /*td.authCode = function(callback) {
 
 	var options = {
@@ -398,9 +502,9 @@ module.exports = function(app, Quote, Token, User, Contact, needle, rest) {
 	needle.post(url, databody, function(err, resp, body) {
 		callback(body['auth_code']);
 	});
-}
+}*/
 
-td.getTokens = function(authCode, callback) {
+/*td.getTokens = function(authCode, callback) {
 	var options = {
 		code: ''+authCode+'',
 		client_id: 'iesgbqOcGs@tdispatch.com',
@@ -416,9 +520,9 @@ td.getTokens = function(authCode, callback) {
 
 	needle.post(url, options, function(err, resp, body) {
 		callback(body);
-	});*/
+	});
 
-
+*/
 /*td.authCode(function(authCode) {
 	if(authCode) {
 		td.getTokens(authCode, function(tokens) {
@@ -434,19 +538,3 @@ td.getTokens = function(authCode, callback) {
 		});
 	}
 });*/
-
-
-/*
-td.saveTokens = function(tokens, callback) {
-	var token = new Token();
-	token.access = tokens['access_token'];
-	token.refresh = tokens['refresh_token'];
-	token.save(function(err) {
-		if(err) {
-			callback(false);
-		} else {
-			callback(true);
-		}
-	});
-}
-*/

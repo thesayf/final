@@ -11,52 +11,123 @@
     <![endif]-->
     <link rel="stylesheet" href="assets/css/style.css" type="text/css"/>
   </head>
-  <body class="am-splash-screen">
-    <div class="am-wrapper am-login am-signup">
+  <div class="am-splash-screen">
+    <div class="am-wrapper2 am-login am-signup">
       <div class="am-content">
         <div class="main-content">
           <div class="login-container sign-up">
             <div class="panel panel-default">
-              <div class="panel-heading"><img src="assets/img/logo-full-retina.png" alt="logo" width="150px" height="39px" class="logo-img"><span>Please enter your user information.</span></div>
+              <div class="panel-heading"><img src="" alt="" width="150px" height="39px" class="logo-img"><span>Please enter your user information.</span></div>
               <div class="panel-body">
-                <form action="index.html" parsley-validate="" novalidate="" method="get" class="form-horizontal">
-                  <div class="title"><span>Sign up with</span></div>
+                <form novalidate="" method="post" class="form-horizontal">
                   <div class="sign-up-form">
-                    <div class="form-group row social-signup">
-                      <div class="col-xs-6">
-                        <button type="button" class="btn btn-block btn-social btn-facebook"><i class="fa fa-facebook icon icon-left"></i> Facebook</button>
-                      </div>
-                      <div class="col-xs-6">
-                        <button type="button" class="btn btn-block btn-social btn-twitter"><i class="fa fa-twitter icon icon-left"></i> Twitter</button>
-                      </div>
-                    </div>
-                    <div class="title"><span class="title">Or</span></div>
+
+                    <!-- start of the sign up form-->
+
+                    <!--Business Name-->
                     <div class="form-group">
                       <div id="nick-handler" class="input-group"><span class="input-group-addon"><i class="icon s7-user"></i></span>
-                        <input type="text" name="nick" data-parsley-trigger="change" data-parsley-errors-messages-disabled="true" data-parsley-class-handler="#nick-handler" required="" placeholder="Username" autocomplete="off" class="form-control">
+                        <input ng-model="user.businessname" type="text" name="userBizName" required="" placeholder="Business Name" autocomplete="off" class="form-control">
                       </div>
                     </div>
+                    <!--Business Name-->
+
+                     <!--Address-->
+                    <div class="form-group row">
+                      <div class="col-xs-6">
+                          <div id="confirm-handler" class="input-group"><span class="input-group-addon"><i class="icon s7-map-marker"></i></span>
+                            <input name="userDoorNumber" ng-model="user.doornumber" type="text" required="" placeholder="Door Number" class="form-control">
+                          </div>
+                      </div>
+                      <div class="col-xs-6">
+                        <div id="password-handler" class="input-group"><span class="input-group-addon"><i class="icon s7-map-marker"></i></span>
+                          <input name="userAddress1" ng-model="user.address" type="text" placeholder="Address Line 1" required="" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-xs-6">
+                        <div id="confirm-handler" class="input-group"><span class="input-group-addon"><i class="icon s7-map-marker"></i></span>
+                          <input name="userPostcode" ng-model="user.postcode" type="text" required="" placeholder="Postcode" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-xs-6">
+                        <div id="confirm-handler" class="input-group"><span class="input-group-addon"><i class="icon s7-map-marker"></i></span>
+                          <input name="userCity" ng-model="user.city" type="text" required="" placeholder="City" class="form-control">
+                        </div>
+                      </div>
+                    </div>
+                    <!--Address-->
+
+                    <!--Business Type-->
+                     <div class="form-group">
+                      <div class="col-sm-12">
+                        <select class="form-control" ng-model="user.businesstype">
+                            <option ng-repeat="option in bizType.availableOptions" ng-disabled="option.dis" value="{{option.name}}">{{option.name}}</option>
+                        </select>
+                      </div>
+                    </div>
+                    <!--Business Type-->
+
+                     <!-- first and last name -->
+                    <div class="form-group row">
+                      <div class="col-xs-6">
+                        <div id="password-handler" class="input-group"><span class="input-group-addon"><i class="icon s7-id"></i></span>
+                          <input name="userFirstname" ng-model="user.firstname" type="text" placeholder="First Name" required="" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-xs-6">
+                        <div id="confirm-handler" class="input-group"><span class="input-group-addon"><i class="icon s7-id"></i></span>
+                          <input name="userLastname" ng-model="user.lastname" type="text" required="" placeholder="Last Name " class="form-control">
+                        </div>
+                      </div>
+                    </div>
+                      <!--first and last name-->
+
+                    <!--Mobile-->
+                    <div class="form-group">
+                      <div id="email-handler" class="input-group"><span class="input-group-addon"><i class="icon s7-phone"></i></span>
+                        <input name="userMobile" ng-model="user.mobile" type="text" name="text" required="" placeholder="Mobile" autocomplete="off" class="form-control">
+                      </div>
+                    </div>
+                    <!--Mobile-->
+
+                    <!--email-->
                     <div class="form-group">
                       <div id="email-handler" class="input-group"><span class="input-group-addon"><i class="icon s7-mail"></i></span>
-                        <input type="email" name="email" data-parsley-trigger="change" data-parsley-errors-messages-disabled="true" data-parsley-class-handler="#email-handler" required="" placeholder="E-mail" autocomplete="off" class="form-control">
+                        <input ng-model="user.email" type="email" name="userEmail" required="" placeholder="E-mail" autocomplete="off" class="form-control">
                       </div>
                     </div>
+                    <!--email-->
+
+                      <!--username-->
+                    <div class="form-group">
+                      <div id="nick-handler" class="input-group"><span class="input-group-addon"><i class="icon s7-user"></i></span>
+                        <input ng-model="user.username" type="text" name="userUsername" required="" placeholder="Username" autocomplete="off" class="form-control">
+                      </div>
+                    </div>
+                    <!--username-->
+
+                    <!--password-->
                     <div class="form-group row">
                       <div class="col-xs-6">
                         <div id="password-handler" class="input-group"><span class="input-group-addon"><i class="icon s7-lock"></i></span>
-                          <input id="pass1" type="password" data-parsley-errors-messages-disabled="true" placeholder="Password" data-parsley-class-handler="#password-handler" required="" class="form-control">
+                          <input ng-model="user.password" name="userPassword" type="password" placeholder="Password" required="" class="form-control">
                         </div>
                       </div>
                       <div class="col-xs-6">
                         <div id="confirm-handler" class="input-group"><span class="input-group-addon"><i class="icon s7-lock"></i></span>
-                          <input parsley-equalto="#pass1" type="password" data-parsley-errors-messages-disabled="true" data-parsley-class-handler="#confirm-handler" required="" placeholder="Confirm" class="form-control">
+                          <input ng-model="user.password2" name="userPassword2" type="password" required="" placeholder="Confirm" class="form-control">
                         </div>
                       </div>
                     </div>
+                    <!--password-->
+
+
+                    <!-- end of the sign up form-->
+
                   </div>
                   <p class="conditions">By creating an account, you agree with the <a href="#">Terms and Conditions</a>.</p>
                   <p class="conditions"><a href="/login">Login</a>.</p>
-                  <button type="submit" class="btn btn-block btn-primary btn-lg">Sign Up</button>
+                  <button ng-click="register(user)" class="btn btn-block btn-primary btn-lg">Sign Up</button>
                 </form>
               </div>
             </div>
@@ -65,5 +136,5 @@
         </div>
       </div>
     </div>
-  </body>
+  </div>
 </html>

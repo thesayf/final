@@ -4,16 +4,50 @@ app.controller('HomeCtrl', function($scope) {
 })
 
 // Ctrl For Signup
-app.controller('DashSignupCtrl', function($scope, $http, $rootScope) {
-    $scope.register = function(user){
-        //todo verify if the passwords are the same
-        if(user.password == user.password2){
-            $http.post('/api/register', user)
-            .success(function(user){
-                $rootScope.currentUser = user;
-                console.log(user);
-            });
-        }
+app.controller('DashSignupCtrl', function($scope, $http, $rootScope, validation) {
+    $scope.user = {};
+    $scope.user.businesstype = 'Business Type';
+    $scope.bizType = {
+    availableOptions: [
+      {name: 'Business Type', dis: true},
+      {name: 'Removal Company'},
+      {name: 'Courier'},
+      {name: 'Clearance'},
+      {name: 'Logistics'}
+    ],
+   };
+
+    $scope.register = function(){
+        $http.post('/api/register', $scope.user)
+        .success(function(user){
+            $rootScope.currentUser = user;
+            console.log(user);
+        });
+
+        /*var valiOptions = [
+            {eleName: 'userAddress1', type: 'text', msg: 'Please enter your address!'},
+            {eleName: 'userDoorNumber', type: 'text', msg: 'Please enter your door number!'},
+            {eleName: 'userCity', type: 'text', msg: 'Please enter your city!'},
+            {eleName: 'userPostcode', type: 'postcode', msg: 'Please enter a valid from postcode!'},
+            {eleName: 'userFirstname', type: 'name', msg: 'Please enter a valid Firstname!'},
+            {eleName: 'userLastname', type: 'name', msg: 'Please enter a valid Lastname!'},
+            {eleName: 'userMobile', type: 'number', msg: 'Please enter a valid Mobile Number!'},
+            {eleName: 'userEmail', type: 'email', msg: 'Please enter a valid email address!'},
+            {eleName: 'userUsername', type: 'text', msg: 'Please enter a username!'},
+            {eleName: 'userPassword', type: 'password', msg: 'Please enter a password!'},
+            {eleName: 'userPassword2', type: 'passwordConfirm', msg: 'Please confirm password!'},
+        ]
+        validation.checkVal(valiOptions, function(callback) {
+            if(callback > 0) {
+                return false
+            } else {
+                $http.post('/api/register', $scope.user)
+                .success(function(user){
+                    $rootScope.currentUser = user;
+                    console.log(user);
+                });
+            }
+        })*/
     };
 })
 
@@ -135,8 +169,7 @@ app.controller('AdminHomeCtrl', function($scope, $http) {
 })
 
 // Ctrl For Dash
-app.controller('DashHomeCtrl', function($scope, dash) {
-    $scope.dash = dash;
+app.controller('DashHomeCtrl', function($scope) {
 })
 
 // Ctrl For Dash
@@ -285,11 +318,13 @@ app.controller('DashJobCompleteCtrl', function($scope, $location, dashInstant) {
 })
 
 // Ctrl For Navigation
-app.controller('NaviCtrl', function($scope, views, $route) {
+app.controller('NaviCtrl', function($scope, views, $route, auth) {
     $scope.views = views;
     // Grab appRoute.js Action Param
-    views.type = $route.current.type;
     views.currentView = $route.current.action;
+    views.currentType = $route.current.type;
+    views = $scope.views;
+    auth.intercept(views);
 
     $scope.logout = function(){
         $http.post("/api/logout").success(function(){
@@ -312,6 +347,6 @@ app.controller('NaviCtrl', function($scope, views, $route) {
 app.controller('NaviAdminCtrl', function($scope, views, $route) {
     $scope.views = views;
     // Grab appRoute.js Action Param
-    views.type = $route.current.type;
-    views.currentView = $route.current.action;
+    views.currentType = $route.current.action.type;
+    views.currentView = $route.current.action.view;
 })
